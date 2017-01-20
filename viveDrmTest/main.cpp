@@ -9,10 +9,15 @@ string APP_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDFypCg0OHfBC+VZLSWPbNSgD
 
 int main()
 {
-
-	htc_vita_api_wrapper vitaApi{ "bd67b286-aafc-449d-8896-bb7e9b351876", APP_KEY };
-	vitaApi.init();
-	vitaApi.checkDRM();
+	try {
+		htc_vita_api_wrapper vitaApi{ "bd67b286-aafc-449d-8896-bb7e9b351876", APP_KEY };
+		vitaApi.init();
+		vitaApi.checkDRM();
+	}
+	catch (exception *e)
+	{
+		cout << e->what() << endl;
+	}
 
 	int t;
 	cin >> t;

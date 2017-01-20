@@ -3,22 +3,27 @@
 const LPCSTR htc_vita_api_wrapper::dllName = "vita_api";
 htc_vita_api_wrapper *htc_vita_api_wrapper::instnace;
 
-htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string publicKey) : appID{appID}, publicKey{publicKey}
+htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string publicKey) : 
+	appID{appID}, 
+	publicKey{publicKey},
+	VIVEDLLHANDLE{ nullptr },
+	csharpdllhandle{ nullptr }
 {
 	if (htc_vita_api_wrapper::instnace != NULL)
-		throw("htc_vita_api_wrapper is a singletone class");
+		throw new std::exception("htc_vita_api_wrapper is a singletone class");
 		
 	this->VIVEDLLHANDLE.reset(LoadLibrary(this->dllName));
 
-	if (this->VIVEDLLHANDLE.get() == NULL)
-		throw("Can not load dll");
-	
+	if (this->VIVEDLLHANDLE.get() == nullptr)
+		throw new std::exception("Can not load dll");
+		
+
 	this->vive_init = (VIVE_INIT_FUNC)GetProcAddress(VIVEDLLHANDLE.get(), "init");
 	if (!vive_init)
 	{
 		//todo: check if interfeers with the destructor
 		FreeLibrary(this->VIVEDLLHANDLE.get());
-		throw("Can not find init function in the dll");		
+		throw new std::exception("Can not find init function in the dll");
 	}
 
 	htc_vita_api_wrapper::instnace = this;
@@ -29,7 +34,7 @@ bool htc_vita_api_wrapper::verifySignature(std::string message, std::string sign
 
 	htc_vita_api_wrapper::instnace->csharpdllhandle.reset(LoadLibrary("signatureVerifier.dll"));
 	if (htc_vita_api_wrapper::instnace->csharpdllhandle.get() == NULL)
-		throw("Can not load signatureVerifier dll");
+		throw new std::exception("Can not load signatureVerifier dll");
 
 	csharp_verifyPublicKey verifyPublicKey = (csharp_verifyPublicKey)GetProcAddress(htc_vita_api_wrapper::instnace->csharpdllhandle.get(), "verifyPublicKey");
 
@@ -39,7 +44,7 @@ bool htc_vita_api_wrapper::verifySignature(std::string message, std::string sign
 	{
 		//todo: check if interfeers with the constructor
 		FreeLibrary(htc_vita_api_wrapper::instnace->VIVEDLLHANDLE.get());
-		throw("Can not find verifyPublicKey function in the dll");
+		throw new std::exception("Can not find verifyPublicKey function in the dll");
 	}
 
 	try {
