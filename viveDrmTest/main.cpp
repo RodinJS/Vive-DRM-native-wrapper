@@ -11,7 +11,7 @@ int main()
 {
 	try {
 		htc_vita_api_wrapper vitaApi{ "bd67b286-aafc-449d-8896-bb7e9b351876", APP_KEY };		
-		vitaApi.checkDRM();
+		cout <<"verification result " <<vitaApi.checkDRM();
 	}
 	catch (exception *e)
 	{
