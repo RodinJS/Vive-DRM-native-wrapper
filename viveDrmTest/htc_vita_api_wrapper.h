@@ -16,7 +16,7 @@ private:
 	static htc_vita_api_wrapper *instnace;
 
 	typedef void(CALLBACK* VIVE_INIT_FUNC)(const char *, int(*callback)(char *message, char *signature));
-	typedef bool(CALLBACK* csharp_verifyPublicKey)(const char *message, const char *signature);
+	typedef bool(CALLBACK* csharp_verifyPublicKey)(const char *message, const char *signature, const char *publicKey);
 	HINSTANCE VIVEDLLHANDLE;
 	HINSTANCE csharpdllhandle;
 
@@ -25,6 +25,7 @@ private:
 	static int vive_callback(char *message, char *signature);
 	
 	std::string appID;
+	std::string publicKey;
 
 	bool recievedResoponse = false;
 	std::string responseMessage;
@@ -33,18 +34,16 @@ private:
 	bool isError = false;
 	std::string error;
 	std::string errorCode;
-
+	
 	long long issueTime;
 	long long expirationTime;
+
 public:
 	
-	htc_vita_api_wrapper(std::string appID);
+	htc_vita_api_wrapper(std::string appID, std::string publicKey);
 	int init();
 	static htc_vita_api_wrapper* getInstance();
-	static bool verifySignature(std::string message, std::string signature);
-
-	std::string& getLastMessage();
-	std::string& getLastSignature();
+	static bool verifySignature(std::string message, std::string signature, std::string publicKey);
 
 	bool checkDRM();
 

@@ -5,10 +5,12 @@
 
 using namespace std;
 
+string APP_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDFypCg0OHfBC+VZLSWPbNSgDo9qg/yQORDwGy1rKIboMj3IXn4Zy6h6bgn8kiMY7VI0lPwIj9lijT3ZxkzuTsI5GsK//Y1bqeTol4OUFR+47gj+TUuekAS2WMtglKox+/7mO6CA1gV+jZrAKo6YSVmPd+oFsgisRcqEgNh5MIURQIDAQAB";
+
 int main()
 {
 
-	htc_vita_api_wrapper vitaApi{ "bd67b286-aafc-449d-8896-bb7e9b351876" };
+	htc_vita_api_wrapper vitaApi{ "bd67b286-aafc-449d-8896-bb7e9b351876", APP_KEY };
 	vitaApi.init();
 	vitaApi.checkDRM();
 

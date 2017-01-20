@@ -3,7 +3,7 @@
 const LPCSTR htc_vita_api_wrapper::dllName = "vita_api";
 htc_vita_api_wrapper *htc_vita_api_wrapper::instnace;
 
-htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID) : appID{appID}
+htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string publicKey) : appID{appID}, publicKey{publicKey}
 {
 	if (htc_vita_api_wrapper::instnace != NULL)
 		throw("htc_vita_api_wrapper is a singletone class");
@@ -23,7 +23,7 @@ htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID) : appID{appID}
 	htc_vita_api_wrapper::instnace = this;
 }
 
-bool htc_vita_api_wrapper::verifySignature(std::string message, std::string signature)
+bool htc_vita_api_wrapper::verifySignature(std::string message, std::string signature, std::string publicKey)
 {
 	htc_vita_api_wrapper::instnace->csharpdllhandle = LoadLibrary("signatureVerifier.dll");
 	if (htc_vita_api_wrapper::instnace->csharpdllhandle == NULL)
@@ -41,7 +41,7 @@ bool htc_vita_api_wrapper::verifySignature(std::string message, std::string sign
 	}
 
 	try {
-		res = verifyPublicKey(message.c_str(), signature.c_str());
+		res = verifyPublicKey(message.c_str(), signature.c_str(), publicKey.c_str());
 	}
 	catch (std::exception e)
 	{		
@@ -82,7 +82,7 @@ int htc_vita_api_wrapper::vive_callback(char *message, char *signature)
 		return 1;
 	}
 
-	bool signatureVerification = verifySignature(_this->appID + "\n" + Message, Signature);
+	bool signatureVerification = verifySignature(_this->appID + "\n" + Message, Signature, _this->publicKey);
 	if (!signatureVerification)
 	{
 		_this->isError = true;
