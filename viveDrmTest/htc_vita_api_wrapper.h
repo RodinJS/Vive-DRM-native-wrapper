@@ -11,6 +11,7 @@
 
 using json = nlohmann::json;
 
+//todo: implement a dll class
 struct dllDeleter {
 	void operator()(HMODULE dll) { FreeLibrary(dll); }
 };
@@ -30,7 +31,7 @@ private:
 	typedef bool(CALLBACK* csharp_verifyPublicKey)(const char *message, const char *signature, const char *publicKey);
 
 	dll_unique_ptr<std::remove_pointer_t<HMODULE>> VIVEDLLHANDLE = nullptr;
-	dll_unique_ptr<std::remove_pointer_t<HMODULE>> csharpdllhandle = nullptr;
+	dll_unique_ptr<std::remove_pointer_t<HMODULE>> CSHARPDLLHANDLE = nullptr;
 
 	VIVE_INIT_FUNC vive_init;
 

@@ -8,7 +8,7 @@ htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string public
 	appID{appID}, 
 	publicKey{publicKey},
 	VIVEDLLHANDLE{ nullptr },
-	csharpdllhandle{ nullptr }
+	CSHARPDLLHANDLE{ nullptr }
 {
 	if (htc_vita_api_wrapper::instnace != NULL)
 		throw new std::exception("htc_vita_api_wrapper is a singletone class");
@@ -33,11 +33,11 @@ htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string public
 bool htc_vita_api_wrapper::verifySignature(std::string message, std::string signature, std::string publicKey)
 {
 
-	htc_vita_api_wrapper::instnace->csharpdllhandle.reset(LoadLibrary(htc_vita_api_wrapper::SignatureVerifierDLLName));
-	if (htc_vita_api_wrapper::instnace->csharpdllhandle.get() == NULL)
+	htc_vita_api_wrapper::instnace->CSHARPDLLHANDLE.reset(LoadLibrary(htc_vita_api_wrapper::SignatureVerifierDLLName));
+	if (htc_vita_api_wrapper::instnace->CSHARPDLLHANDLE.get() == NULL)
 		throw new std::exception("Can not load signatureVerifier dll");
 
-	csharp_verifyPublicKey verifyPublicKey = (csharp_verifyPublicKey)GetProcAddress(htc_vita_api_wrapper::instnace->csharpdllhandle.get(), "verifyPublicKey");
+	csharp_verifyPublicKey verifyPublicKey = (csharp_verifyPublicKey)GetProcAddress(htc_vita_api_wrapper::instnace->CSHARPDLLHANDLE.get(), "verifyPublicKey");
 
 	bool res = false;
 
@@ -53,11 +53,11 @@ bool htc_vita_api_wrapper::verifySignature(std::string message, std::string sign
 	}
 	catch (std::exception e)
 	{		
-		FreeLibrary(htc_vita_api_wrapper::instnace->csharpdllhandle.get());
+		FreeLibrary(htc_vita_api_wrapper::instnace->CSHARPDLLHANDLE.get());
 		return res;
 	}
 
-	FreeLibrary(htc_vita_api_wrapper::instnace->csharpdllhandle.get());
+	FreeLibrary(htc_vita_api_wrapper::instnace->CSHARPDLLHANDLE.get());
 	return res;
 }
 
