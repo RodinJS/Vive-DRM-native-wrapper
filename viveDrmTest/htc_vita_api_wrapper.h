@@ -57,8 +57,6 @@ public:
 	static bool verifySignature(std::string message, std::string signature, std::string publicKey);
 
 	bool checkDRM();
-
-	~htc_vita_api_wrapper();
 };
 
 std::string base64_decode(const std::string &in);

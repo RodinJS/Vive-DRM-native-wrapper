@@ -163,11 +163,6 @@ bool htc_vita_api_wrapper::checkDRM()
 	return true;
 }
 
-htc_vita_api_wrapper::~htc_vita_api_wrapper()
-{
-	FreeLibrary(this->VIVEDLLHANDLE.get());
-}
-
 
 std::string base64_decode(const std::string &in) {
 
