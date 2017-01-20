@@ -4,12 +4,22 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <memory>
+#include <stdexcept>
+
 #include "json.hpp"
 
 using json = nlohmann::json;
 
+struct dllDeleter {
+	void operator()(HMODULE dll) { FreeLibrary(dll); }
+};
+
 class htc_vita_api_wrapper
 {
+	template<typename T>
+	using dll_unique_ptr = std::unique_ptr<T, dllDeleter>;
+
 private:
 
 	static const LPCSTR dllName;
@@ -17,8 +27,9 @@ private:
 
 	typedef void(CALLBACK* VIVE_INIT_FUNC)(const char *, int(*callback)(char *message, char *signature));
 	typedef bool(CALLBACK* csharp_verifyPublicKey)(const char *message, const char *signature, const char *publicKey);
-	HINSTANCE VIVEDLLHANDLE;
-	HINSTANCE csharpdllhandle;
+
+	dll_unique_ptr<std::remove_pointer_t<HMODULE>> VIVEDLLHANDLE = nullptr;
+	dll_unique_ptr<std::remove_pointer_t<HMODULE>> csharpdllhandle = nullptr;
 
 	VIVE_INIT_FUNC vive_init;
 

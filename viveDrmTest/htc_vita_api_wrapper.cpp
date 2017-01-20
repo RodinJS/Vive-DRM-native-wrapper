@@ -7,16 +7,17 @@ htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string public
 {
 	if (htc_vita_api_wrapper::instnace != NULL)
 		throw("htc_vita_api_wrapper is a singletone class");
-	
-	this->VIVEDLLHANDLE = LoadLibrary(this->dllName);
-	if (VIVEDLLHANDLE == NULL)	
+		
+	this->VIVEDLLHANDLE.reset(LoadLibrary(this->dllName));
+
+	if (this->VIVEDLLHANDLE.get() == NULL)
 		throw("Can not load dll");
 	
-	this->vive_init = (VIVE_INIT_FUNC)GetProcAddress(VIVEDLLHANDLE, "init");
+	this->vive_init = (VIVE_INIT_FUNC)GetProcAddress(VIVEDLLHANDLE.get(), "init");
 	if (!vive_init)
 	{
-		//todo: check if interfeers with the constructor
-		FreeLibrary(this->VIVEDLLHANDLE);
+		//todo: check if interfeers with the destructor
+		FreeLibrary(this->VIVEDLLHANDLE.get());
 		throw("Can not find init function in the dll");		
 	}
 
@@ -25,18 +26,19 @@ htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string public
 
 bool htc_vita_api_wrapper::verifySignature(std::string message, std::string signature, std::string publicKey)
 {
-	htc_vita_api_wrapper::instnace->csharpdllhandle = LoadLibrary("signatureVerifier.dll");
-	if (htc_vita_api_wrapper::instnace->csharpdllhandle == NULL)
+
+	htc_vita_api_wrapper::instnace->csharpdllhandle.reset(LoadLibrary("signatureVerifier.dll"));
+	if (htc_vita_api_wrapper::instnace->csharpdllhandle.get() == NULL)
 		throw("Can not load signatureVerifier dll");
 
-	csharp_verifyPublicKey verifyPublicKey = (csharp_verifyPublicKey)GetProcAddress(htc_vita_api_wrapper::instnace->csharpdllhandle, "verifyPublicKey");
+	csharp_verifyPublicKey verifyPublicKey = (csharp_verifyPublicKey)GetProcAddress(htc_vita_api_wrapper::instnace->csharpdllhandle.get(), "verifyPublicKey");
 
 	bool res = false;
 
 	if (!verifyPublicKey)
 	{
 		//todo: check if interfeers with the constructor
-		FreeLibrary(htc_vita_api_wrapper::instnace->VIVEDLLHANDLE);
+		FreeLibrary(htc_vita_api_wrapper::instnace->VIVEDLLHANDLE.get());
 		throw("Can not find verifyPublicKey function in the dll");
 	}
 
@@ -45,11 +47,11 @@ bool htc_vita_api_wrapper::verifySignature(std::string message, std::string sign
 	}
 	catch (std::exception e)
 	{		
-		FreeLibrary(htc_vita_api_wrapper::instnace->csharpdllhandle);
+		FreeLibrary(htc_vita_api_wrapper::instnace->csharpdllhandle.get());
 		return res;
 	}
 
-	FreeLibrary(htc_vita_api_wrapper::instnace->csharpdllhandle);
+	FreeLibrary(htc_vita_api_wrapper::instnace->csharpdllhandle.get());
 	return res;
 }
 
@@ -158,7 +160,7 @@ bool htc_vita_api_wrapper::checkDRM()
 
 htc_vita_api_wrapper::~htc_vita_api_wrapper()
 {
-	FreeLibrary(this->VIVEDLLHANDLE);
+	FreeLibrary(this->VIVEDLLHANDLE.get());
 }
 
 
