@@ -1,6 +1,7 @@
 #include "htc_vita_api_wrapper.h"
 
-const LPCSTR htc_vita_api_wrapper::dllName = "vita_api";
+const LPCSTR htc_vita_api_wrapper::VitaApiDLLName = "vita_api";
+const LPCSTR htc_vita_api_wrapper::SignatureVerifierDLLName = "signatureVerifier";
 htc_vita_api_wrapper *htc_vita_api_wrapper::instnace;
 
 htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string publicKey) : 
@@ -12,7 +13,7 @@ htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string public
 	if (htc_vita_api_wrapper::instnace != NULL)
 		throw new std::exception("htc_vita_api_wrapper is a singletone class");
 		
-	this->VIVEDLLHANDLE.reset(LoadLibrary(this->dllName));
+	this->VIVEDLLHANDLE.reset(LoadLibrary(this->VitaApiDLLName));
 
 	if (this->VIVEDLLHANDLE.get() == nullptr)
 		throw new std::exception("Can not load dll");
@@ -32,7 +33,7 @@ htc_vita_api_wrapper::htc_vita_api_wrapper(std::string appID, std::string public
 bool htc_vita_api_wrapper::verifySignature(std::string message, std::string signature, std::string publicKey)
 {
 
-	htc_vita_api_wrapper::instnace->csharpdllhandle.reset(LoadLibrary("signatureVerifier.dll"));
+	htc_vita_api_wrapper::instnace->csharpdllhandle.reset(LoadLibrary(htc_vita_api_wrapper::SignatureVerifierDLLName));
 	if (htc_vita_api_wrapper::instnace->csharpdllhandle.get() == NULL)
 		throw new std::exception("Can not load signatureVerifier dll");
 
@@ -133,11 +134,6 @@ int htc_vita_api_wrapper::vive_callback(char *message, char *signature)
 	return 0;
 }
 
-int htc_vita_api_wrapper::init()
-{
-	this->vive_init(this->appID.c_str(), &this->vive_callback);
-	return 0;
-}
 
 htc_vita_api_wrapper* htc_vita_api_wrapper::getInstance()
 {
@@ -147,6 +143,8 @@ htc_vita_api_wrapper* htc_vita_api_wrapper::getInstance()
 
 bool htc_vita_api_wrapper::checkDRM()
 {
+	this->vive_init(this->appID.c_str(), &this->vive_callback);
+
 	while (!this->recievedResoponse)
 		Sleep(50);
 

@@ -22,7 +22,8 @@ class htc_vita_api_wrapper
 
 private:
 
-	static const LPCSTR dllName;
+	static const LPCSTR VitaApiDLLName;
+	static const LPCSTR SignatureVerifierDLLName;
 	static htc_vita_api_wrapper *instnace;
 
 	typedef void(CALLBACK* VIVE_INIT_FUNC)(const char *, int(*callback)(char *message, char *signature));
@@ -52,7 +53,6 @@ private:
 public:
 	
 	htc_vita_api_wrapper(std::string appID, std::string publicKey);
-	int init();
 	static htc_vita_api_wrapper* getInstance();
 	static bool verifySignature(std::string message, std::string signature, std::string publicKey);
 
